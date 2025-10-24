@@ -66,8 +66,15 @@ function PID(Kp, Ki, Kd, min, max)
     }
 end
 
-PID_p = PID(50, 0, 2000) -- PID without integral clamp
-PID_r = PID(0.5, 0, 800) -- PID without integral clamp
+    pitchP = property.getNumber("PITCH P")
+    pitchI = property.getNumber("PITCH I")
+    pitchD = property.getNumber("PITCH D")
+    rollP = property.getNumber("ROLL P")
+    rollI = property.getNumber("ROLL I")
+    rollD = property.getNumber("ROLL D")
+
+PID_p = PID(pitchP, pitchI, pitchD, pitchSens, pitchSens) -- PID with integral clamp
+PID_r = PID(rollP, rollI, rollD) -- PID without integral clamp
 
 function onTick()
     prevHeading = prevHeading or 0
@@ -75,6 +82,7 @@ function onTick()
     roll = input.getNumber(16)
     heading = input.getNumber(17)
     steering = input.getNumber(1)
+    pitchSens = property.getNumber("PITCH SENSITIVITY")
     local steerDead = property.getNumber("STEER DEADZONE") or 0.01
     local steeringOff = math.abs(steering) <= steerDead
     steeringSens = property.getNumber("STEERING SENSITIVITY")
@@ -102,8 +110,8 @@ function onTick()
         rudderYaw = math.max(-1, math.min(1, steering * steeringSens))
     end
 
-    output.setNumber(1, rudderRight)
-    output.setNumber(2, rudderLeft)
+    output.setNumber(1, rudderLeft)
+    output.setNumber(2, rudderRight)
     output.setNumber(3, rudderYaw)
     prevHeading = heading
 end
